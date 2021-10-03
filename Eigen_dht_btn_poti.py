@@ -21,10 +21,10 @@ dht = adafruit_dht.DHT11(board.D9)  # nRF52840, Grove D4
 
 # Constants
 INTERVAL = 5  # time for measuring interval
-WEIGHT = 5000  # 5kg -> 5000g Poti Anzeige von 0-5000g
+WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
 
 # Variable
-check_weight = 2500
+check_weight = 2500  # dummy Variabel until btn works
 
 # Main Loop
 while True:
@@ -36,14 +36,15 @@ while True:
         # Read the humidity and convert it to integer
         humidity = int(round(dht.humidity))
 
-        # Read Poti
+        # Read Potentiometer value
         value = poti.value
-        weight = int(round((value * WEIGHT) / 65536))
+        # Turn read values on Poti, left=0 : right=5000
+        weight = int(round(WEIGHT-((value * WEIGHT) / 65536)))
 
         # Set check_weight: weight of dryed plant
         if btn.value:
-           check_weight = weight
-           print(f'button pressed new threshold = {check_weight}')
+            check_weight = weight
+            print(f'button pressed new threshold = {check_weight}')
 
         # Check if plant needs water: Turn on onboard led
         if weight <= check_weight:
@@ -67,6 +68,7 @@ while True:
 
 
 
-
+###########
 # infos
+###########
 # Grove Board Layout - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters

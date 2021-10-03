@@ -26,7 +26,10 @@ WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
 # Variable
 treshhold_weight = 2500  # set at startup in mid of poti
 measure_on_startup = True
+<<<<<<< HEAD
 run_once = True
+=======
+>>>>>>> afdcc30b2047560ea6ba27133229b4de730d899e
 
 # Main Loop
 while True:
@@ -36,6 +39,10 @@ while True:
     # start % 5 = True when start = xxxx5
     start = round(time.time())
     t = time.localtime(start)
+<<<<<<< HEAD
+=======
+    run_once = True
+>>>>>>> afdcc30b2047560ea6ba27133229b4de730d899e
 
     if start % INTERVAL == 0 and run_once or measure_on_startup:
 

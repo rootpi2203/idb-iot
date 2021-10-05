@@ -1,7 +1,14 @@
 ###########
 # readme
-
+# Prototyp: Gewicht, Temperatur, Luftfeuchtigkeit und Lichtstärke messen
+# mit button die Gewichtsgrenze festlegen. Gewicht fällt darunter dann wird
+# die onboard led eingeschaltet.
+###########
 # Grove Board Layout - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters
+# button -> Grove D2
+# potentiometer -> Grove A0
+# dht -> Grove D4
+# light_sen -> Grove A4
 ################################################################################
 
 import analogio   # AnalogIn
@@ -44,9 +51,8 @@ while True:
     #################################################################
     # run_once flag to make sure it doesnt run more often
     # start % 5 = True when start = xxxx5
-    start = round(time.monotonic())
-    start_time = round(time.time())
-    t = time.localtime(start_time)
+    start = round(time.time())
+    t = time.localtime(start)
 
     if start % INTERVAL == 0 and run_once or measure_on_startup:
 
@@ -106,8 +112,3 @@ while True:
 
     # Wait
     time.sleep(0.2)
-
-###########
-# infos
-###########
-# Grove Board Layout - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters

@@ -37,6 +37,7 @@ light_sen = analogio.AnalogIn(board.A4)  # nRF52840 A4, Grove A4
 
 # Constants
 INTERVAL = 5  # time for measuring interval
+start_t1 = 0  # temp storage time
 WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
 LIGHT = 1000  # Lumen dummy calculation
 
@@ -53,8 +54,9 @@ while True:
     # start % 5 = True when start = xxxx5
     start = round(time.time())
     t = time.localtime(start)
+    #print(start)
 
-    if start % INTERVAL == 0 and run_once or measure_on_startup:
+    if start - start_t1 > INTERVAL or measure_on_startup:
 
         try:
             # Read the temperature and convert it to integer
@@ -81,8 +83,8 @@ while True:
             print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Weight:{:d}, threshhold:{:d}, light: {:d}".format(
                 t.tm_hour, t.tm_min, t.tm_sec, -1, -1, -1, -1, -1))
 
-        # set run_once flag false
-        run_once = False
+        # reset time
+        start_t1 = start
 
     # reset run_once flag
     if start % INTERVAL != 0:

@@ -1,3 +1,9 @@
+###########
+# readme
+
+# Grove Board Layout - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters
+################################################################################
+
 import analogio   # AnalogIn
 import digitalio  # onboard led
 import board
@@ -19,17 +25,18 @@ poti = analogio.AnalogIn(board.A0)  # nRF52840 A0, Grove A0
 # setup dht, analog in
 dht = adafruit_dht.DHT11(board.D9)  # nRF52840, Grove D4
 
+# setup light sensor, analog in
+light_sen = analogio.AnalogIn(board.A4)  # nRF52840 A4, Grove A4
+
 # Constants
 INTERVAL = 5  # time for measuring interval
 WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
+LIGHT = 1000  # Lumen dummy calculation
 
 # Variable
 treshhold_weight = 2500  # set at startup in mid of poti
 measure_on_startup = True
-<<<<<<< HEAD
 run_once = True
-=======
->>>>>>> afdcc30b2047560ea6ba27133229b4de730d899e
 
 # Main Loop
 while True:
@@ -37,12 +44,9 @@ while True:
     #################################################################
     # run_once flag to make sure it doesnt run more often
     # start % 5 = True when start = xxxx5
-    start = round(time.time())
-    t = time.localtime(start)
-<<<<<<< HEAD
-=======
-    run_once = True
->>>>>>> afdcc30b2047560ea6ba27133229b4de730d899e
+    start = round(time.monotonic())
+    start_time = round(time.time())
+    t = time.localtime(start_time)
 
     if start % INTERVAL == 0 and run_once or measure_on_startup:
 
@@ -53,18 +57,23 @@ while True:
             humidity = int(round(dht.humidity))
 
             # Read Potentiometer value
-            value = poti.value
+            poti_value = poti.value
             # Turn read values on Poti, left=0 : right=5000
-            weight = int(round(WEIGHT-((value * WEIGHT) / 65536)))
+            weight = int(round(WEIGHT-((poti_value * WEIGHT) / 65536)))
+
+            # Read Light sensor
+            light_value = light_sen.value
+            # calculate Lumen
+            light = int(round((light_value * LIGHT) / 65536))
 
             # Print timestamp, temperatur, humidity
-            print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Weight:{:d}, threshold:{:d}".format(
-                t.tm_hour, t.tm_min, t.tm_sec, temperature, humidity, weight, treshhold_weight))
+            print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Weight:{:d}, threshhold:{:d}, light: {:d}".format(
+                t.tm_hour, t.tm_min, t.tm_sec, temperature, humidity, weight, treshhold_weight, light))
 
         except RuntimeError as e:
             # Reading doesn't always work! Just print error and we'll try again
-            print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Weight:{:d}, threshold:{:d}".format(
-                t.tm_hour, t.tm_min, t.tm_sec, -1, -1, -1, -1))
+            print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Weight:{:d}, threshhold:{:d}, light: {:d}".format(
+                t.tm_hour, t.tm_min, t.tm_sec, -1, -1, -1, -1, -1))
 
         # set run_once flag false
         run_once = False
@@ -97,9 +106,6 @@ while True:
 
     # Wait
     time.sleep(0.2)
-
-
-
 
 ###########
 # infos

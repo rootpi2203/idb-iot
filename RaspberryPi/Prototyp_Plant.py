@@ -38,12 +38,12 @@ lightsen = GroveLightSensor(4)
 
 
 # Constants
-INTERVAL = 2   # time interval. Measurement every Interval second
+INTERVAL = 5   # time interval. Measurement every Interval second
 start_t1 = 0   # temp storage time
 WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
 #LIGHT = 1000   # Lumen dummy calculation
 treshhold_weight = 2500  # set at startup (mid of poti)
-TIME_SLEEP = 0.5
+TIME_SLEEP = 1
 
 
 # Main Loop

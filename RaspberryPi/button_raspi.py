@@ -1,9 +1,12 @@
 import time
-import grovepi
+from grove.factory import Factory
 
-button = 5
-
-grovepi.pinMode(button, 'INPUT')
+pin = 12
+button = Factory.getButton("GPIO-HIGH", pin)
 
 while True:
-    print(grovepi.digitalRead(button))
+    if button.is_pressed():
+        print('Button is pressed')
+    else:
+        print('Button is released')
+    time.sleep(1)

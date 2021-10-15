@@ -1,7 +1,7 @@
 ###########
 # readme
 # Prototyp: Gewicht, Temperatur, Luftfeuchtigkeit und Lichtstärke messen
-# mit button die Gewichtsgrenze festlegen. Gewicht fällt darunter dann wird
+# mit button die Gewichtsgrenze festlegen. Fällt das Gewicht darunter wird
 # die onboard led eingeschaltet.
 ###########
 # Grove Board Layout - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters
@@ -36,28 +36,22 @@ dht = adafruit_dht.DHT11(board.D9)  # nRF52840, Grove D4
 light_sen = analogio.AnalogIn(board.A4)  # nRF52840 A4, Grove A4
 
 # Constants
-INTERVAL = 5  # time for measuring interval
-start_t1 = 0  # temp storage time
+INTERVAL = 5   # time interval. Measurement every Interval second
+start_t1 = 0   # temp storage time
 WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
-LIGHT = 1000  # Lumen dummy calculation
+LIGHT = 1000   # Lumen dummy calculation
 
 # Variable
-treshhold_weight = 2500  # set at startup in mid of poti
-measure_on_startup = True
-run_once = True
+treshhold_weight = 2500  # set at startup (mid of poti)
 
 # Main Loop
 while True:
     # Measuring every INTERVAL Second
     #################################################################
-    # run_once flag to make sure it doesnt run more often
-    # start % 5 = True when start = xxxx5
     start = round(time.time())
     t = time.localtime(start)
-    #print(start)
 
-    if start - start_t1 > INTERVAL or measure_on_startup:
-
+    if start - start_t1 > INTERVAL:
         try:
             # Read the temperature and convert it to integer
             temperature = int(round(dht.temperature))
@@ -86,9 +80,6 @@ while True:
         # reset time
         start_t1 = start
 
-    # reset run_once flag
-    if start % INTERVAL != 0:
-        run_once = True
 
     # Run not time sensitiv code here (Input listener)
     ############################################################
@@ -108,9 +99,6 @@ while True:
     # Turn read values on Poti, left=0 : right=5000
     weight = int(round(WEIGHT-((value * WEIGHT) / 65536)))
     print(f'weight: {weight}, threshhold: {treshhold_weight}')
-
-    # Set measure_on_startup false
-    measure_on_startup = False
 
     # Wait
     time.sleep(0.2)

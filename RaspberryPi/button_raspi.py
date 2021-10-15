@@ -1,7 +1,7 @@
 import time
 from grove.factory import Factory
 
-pin = 12
+pin = 5
 button = Factory.getButton("GPIO-HIGH", pin)
 
 while True:

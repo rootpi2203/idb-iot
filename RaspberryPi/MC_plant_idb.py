@@ -9,10 +9,9 @@
 # potentiometer -> Grove A0
 # dht           -> Grove D16
 # light_sen     -> Grove A4
-# led           -> Grove A2
+# led           -> Grove 6
 # hx711 load    -> Grove PWM (dout_pin=13, clk=12
 ################################################################################
-
 import time
 from grove.grove_led import GroveLed
 from grove.factory import Factory
@@ -28,12 +27,12 @@ button_pin = 5
 poti_pin = 0
 dht11_pin = 16
 light_pin = 4
-#led_pin = 12
+led_pin = 6
 hx711_dout_pin = 13
 hx711_sck_pin = 12
 
 ######## Setup #######################
-#led = GroveLed(12)  # Pi, Grove, setup Led, digital out
+led = GroveLed(led_pin)  # Pi, Grove, setup Led, digital out
 btn = Factory.getButton("GPIO-HIGH", button_pin)  # Pi, Grove D5, setup button, digitla in
 poti = GroveSlidePotentiometer(poti_pin)  # Pi, Grove A0, setup Potentiometer
 dht11 = seeed_dht.DHT('11', dht11_pin)  # Pi, Grove D16, setup dht, analog in
@@ -42,17 +41,15 @@ hx = HX711(hx711_dout_pin, hx711_sck_pin)  # Weight scale
 
 # Constants
 INTERVAL_SENSOR_READING = 5   # time interval. Measurement every Interval second
-INTERVAL_MAIN_LOOP = 0.5
+INTERVAL_MAIN_LOOP = 0.2
 NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
 start_t1 = 0   # temp storage time
-WEIGHT = 5000  # 5kg -> 5000g, Poti Anzeige von 0-5000g
-weight = 2400  # dummy
-#LIGHT = 1000   # Lumen dummy calculation
+weight = 100
 treshhold_weight = 150  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
-
+print_info = False
 ####### Functions ##################
 def read_dht():
     temp, hum = dht11.read()
@@ -134,6 +131,7 @@ while True:
     measure_time = end_meas - start_meas
     if INTERVAL_MAIN_LOOP >= measure_time:
         time.sleep(INTERVAL_MAIN_LOOP - measure_time)
+    else: time.sleep(0)
 
     # Run not time sensitiv code here (Input listener)
     ############################################################
@@ -142,13 +140,13 @@ while True:
         treshhold_weight = weight
         print(f'button pressed new threshold = {treshhold_weight}')
 
-    # Check if plant needs water: Turn on onboard led
+    # Check if plant needs water: Turn on led
     if weight <= treshhold_weight:
-        print('Gewicht zu tief -> Pflanze benötigt Wasser')
-        #led.on()
-    #else:
-        #led.off()
+        led.on()
+    else:
+        led.off()
 
-    # Change and read values on Poti, left=0 : right=5000
-    weight = read_weight(reads=10)
-    print(f'weight: {weight}, threshhold: {treshhold_weight}')
+    if print_info:
+        # Change and read values on Poti, left=0 : right=5000
+        weight = read_weight(reads=10)
+        print(f'weight: {weight}, threshhold: {treshhold_weight}')

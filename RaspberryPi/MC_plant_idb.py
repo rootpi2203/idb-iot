@@ -20,13 +20,19 @@ import seeed_dht
 from grove.grove_light_sensor_v1_2 import GroveLightSensor
 import RPi.GPIO as GPIO
 from hx711 import HX711
+import urllib.request
 # credits to https://github.com/gandalf15/HX711/blob/master/python_examples/all_methods_example.py
+
+####### Thingspeak ####
+# ThingSpeak settings
+TS_WRITE_API_KEY = 'W35TF34ZEWANXUBJ'
+TS_HTTP_HOST = "api.thingspeak.com"
 
 ######## Hardware - Pin Belegung (Grove Board) ##
 button_pin = 5
 poti_pin = 0
 dht11_pin = 16
-light_pin = 4
+light_pin = 2
 led_pin = 6
 hx711_dout_pin = 13
 hx711_sck_pin = 12
@@ -46,7 +52,7 @@ NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
 start_t1 = 0   # temp storage time
 weight = 100
-treshhold_weight = 150  # set at startup (mid of poti)
+threshhold_weight = 150  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
 print_info = False
@@ -83,18 +89,24 @@ def set_scale(weight=50, reads=30):
 def read_weight(reads=30):
     return int(hx.get_weight_mean(reads))
 
-def print_val(Temp, Hum, light, Weight, threshhold_weight):
+def print_val():
     t = time.localtime(time.time())
     print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Light:{:d}, Weight:{:d}, threshhold: {:d}".format(
-        t.tm_hour, t.tm_min, t.tm_sec, Temp, Hum, light, Weight, threshhold_weight))
+        t.tm_hour, t.tm_min, t.tm_sec, temp, hum, light, weight, threshhold_weight))
+
+def send_http():
+    # Send payload as HTTP GET request
+    url = "http://" + TS_HTTP_HOST + "/update"
+    payload = "field1=" + str(temp) + "&field2=" + str(hum) + "&field3=" + str(light) + \
+              "&field4=" +str(weight) + "&field5=" + str(threshhold_weight)
+    thingspeak = url + "?api_key=" + TS_WRITE_API_KEY + "&" + payload
+    response = urllib.request.urlopen(url=thingspeak)
+    print(f'http sent: {response.status}')
 
 def button_pressed():
     pass
 
 def toggle_led():
-    pass
-
-def post_http():
     pass
 
 def isTimerExpired():
@@ -118,10 +130,11 @@ while True:
     start_meas = time.monotonic()  # timing measurement start
     if isTimerExpired() or start_up:
         try:
-            temp, hum = read_dht()   # Read the temperature + humidity
+            hum, temp = read_dht()   # Read the temperature + humidity
             light = read_light()  # Read Light sensor
             weight = read_weight(reads=30)  # reads the mean from 30 values from hx711 (30-> 3sec)
-            print_val(temp, hum, light, weight, treshhold_weight)
+            print_val()
+            send_http()
 
         except RuntimeError as e:
             print_val(-1, -1, -1, -1, -1)
@@ -137,11 +150,11 @@ while True:
     ############################################################
     # Set check_weight: weight of dryed plant by pressing button
     if btn.is_pressed():
-        treshhold_weight = weight
-        print(f'button pressed new threshold = {treshhold_weight}')
+        threshhold_weight = weight
+        print(f'button pressed new threshold = {threshhold_weight}')
 
     # Check if plant needs water: Turn on led
-    if weight <= treshhold_weight:
+    if weight <= threshhold_weight:
         led.on()
     else:
         led.off()
@@ -149,4 +162,4 @@ while True:
     if print_info:
         # Change and read values on Poti, left=0 : right=5000
         weight = read_weight(reads=10)
-        print(f'weight: {weight}, threshhold: {treshhold_weight}')
+        print(f'weight: {weight}, threshhold: {threshhold_weight}')

@@ -19,5 +19,5 @@ while True:
         # reset time
         start_t1 = start + meas_time
 
-       
+
         time.sleep(0.5)

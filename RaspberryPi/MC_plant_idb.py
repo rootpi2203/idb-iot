@@ -90,7 +90,7 @@ def set_scale(weight=50, reads=30):
 def read_weight(reads=30):
     return int(hx.get_weight_mean(reads))
 
-def print_val():
+def print_val(temp, hum, light, weight, threshhold_weight):
     t = time.localtime(time.time())
     print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Light:{:d}, Weight:{:d}, threshhold: {:d}".format(
         t.tm_hour, t.tm_min, t.tm_sec, temp, hum, light, weight, threshhold_weight))
@@ -134,7 +134,7 @@ while True:
             hum, temp = read_dht()   # Read the temperature + humidity
             light = read_light()  # Read Light sensor
             weight = read_weight(reads=30)  # reads the mean from 30 values from hx711 (30-> 3sec)
-            print_val()
+            print_val(temp, hum, light, weight, threshhold_weight)
             send_http()
 
         except RuntimeError as e:

@@ -21,12 +21,12 @@ from grove.grove_light_sensor_v1_2 import GroveLightSensor
 import RPi.GPIO as GPIO
 from hx711 import HX711
 import urllib.request
-from config import *
+from config import config
 # credits to https://github.com/gandalf15/HX711/blob/master/python_examples/all_methods_example.py
 
 ####### Thingspeak ####
 # ThingSpeak settings
-TS_WRITE_API_KEY = config.config['thingspeak_key']
+TS_WRITE_API_KEY = config['thingspeak_key']
 TS_HTTP_HOST = "api.thingspeak.com"
 
 ######## Hardware - Pin Belegung (Grove Board) ##

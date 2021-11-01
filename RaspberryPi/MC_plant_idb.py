@@ -24,7 +24,7 @@ import urllib.request
 from config import config
 # credits to https://github.com/gandalf15/HX711/blob/master/python_examples/all_methods_example.py
 
-####### Thingspeak ####
+####### Thingspeak ########
 # ThingSpeak settings
 TS_WRITE_API_KEY = config['thingspeak_key']
 TS_HTTP_HOST = "api.thingspeak.com"

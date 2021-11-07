@@ -23,11 +23,17 @@ from hx711 import HX711
 import urllib.request
 from config import config
 # credits to https://github.com/gandalf15/HX711/blob/master/python_examples/all_methods_example.py
+# MQTT
+import paho.mqtt.publish as publish
 
 ####### Thingspeak ########
 # ThingSpeak settings
 TS_WRITE_API_KEY = config['thingspeak_key']
 TS_HTTP_HOST = "api.thingspeak.com"
+
+###### MQTT ###############
+MQTT_SERVER = 'localhost'  #config['ipraspi']
+MQTT_PATH = "/test/topic"
 
 ######## Hardware - Pin Belegung (Grove Board) ##
 button_pin = 5
@@ -57,6 +63,8 @@ threshhold_weight = 150  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
 print_info = False
+use_http = True
+use_mqtt = True
 ####### Functions ##################
 def read_dht():
     temp, hum = dht11.read()
@@ -87,28 +95,32 @@ def set_scale(weight=50, reads=30):
             raise ValueError('Cannot calculate mean value.')
         print(f'Current weight on the scale in grams is: {round(hx.get_weight_mean(30), 0)}g')
 
-def read_weight(reads=30):
+def read_weight(reads=50):
     return int(hx.get_weight_mean(reads))
 
-def print_val(temp, hum, light, weight, threshhold_weight):
-    t = time.localtime(time.time())
-    print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Light:{:d}, Weight:{:d}, threshhold: {:d}".format(
-        t.tm_hour, t.tm_min, t.tm_sec, temp, hum, light, weight, threshhold_weight))
+def check_water(weight, threshhold_weight):
+    if weight <= threshhold_weight:
+        return 1
+    else:
+        return 0
 
-def send_http():
+def print_val(temp, hum, light, weight, threshhold_weight, check):
+    t = time.localtime(time.time())
+    print("{:d}:{:02d}:{:02d}- Temp:{:g}, Hum:{:g}, Light:{:d}, Weight:{:d}, threshhold: {:d}, check: {}".format(
+        t.tm_hour, t.tm_min, t.tm_sec, temp, hum, light, weight, threshhold_weight, check))
+
+def send_http(temp, hum, light, weight, threshhold_weight, check):
     # Send payload as HTTP GET request
     url = "http://" + TS_HTTP_HOST + "/update"
     payload = "field1=" + str(temp) + "&field2=" + str(hum) + "&field3=" + str(light) + \
-              "&field4=" +str(weight) + "&field5=" + str(threshhold_weight)
+              "&field4=" + str(weight) + "&field5=" + str(threshhold_weight) + \
+              "&field6=" + str(check)
     thingspeak = url + "?api_key=" + TS_WRITE_API_KEY + "&" + payload
     response = urllib.request.urlopen(url=thingspeak)
     print(f'http sent: {response.status}')
 
-def button_pressed():
-    pass
-
-def toggle_led():
-    pass
+def mqtt_puplish(info_text:str):
+    publish.single(MQTT_PATH, info_text, hostname=MQTT_SERVER)
 
 def isTimerExpired():
     global _counter
@@ -122,7 +134,7 @@ def isTimerExpired():
 
 ##### startup ####
 print(check_setup())  # check setup
-set_scale(weight=100)  # set known load to scale
+set_scale(weight=1000)  # set known load to scale
 
 while True:
     # Measuring every INTERVAL Second
@@ -134,11 +146,17 @@ while True:
             hum, temp = read_dht()   # Read the temperature + humidity
             light = read_light()  # Read Light sensor
             weight = read_weight(reads=30)  # reads the mean from 30 values from hx711 (30-> 3sec)
-            print_val(temp, hum, light, weight, threshhold_weight)
-            send_http()
+            check = check_water(weight, threshhold_weight)
+            if use_mqtt:
+                if check: mqtt_puplish('help I need water')
+                #else: mqtt_puplish('all good')
+
+            print_val(temp, hum, light, weight, threshhold_weight, check)
+            if use_http:
+                send_http(temp, hum, light, weight, threshhold_weight, check)
 
         except RuntimeError as e:
-            print_val(-1, -1, -1, -1, -1)
+            print_val(-1, -1, -1, -1, -1, -1)
 
     end_meas = time.monotonic()  # timing measurement end
     start_up = False
@@ -151,7 +169,7 @@ while True:
     ############################################################
     # Set check_weight: weight of dryed plant by pressing button
     if btn.is_pressed():
-        threshhold_weight = weight
+        threshhold_weight = weight - 20  # set threshhold lower than weight
         print(f'button pressed new threshold = {threshhold_weight}')
 
     # Check if plant needs water: Turn on led

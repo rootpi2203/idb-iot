@@ -149,6 +149,7 @@ while True:
             check = check_water(weight, threshhold_weight)
             if use_mqtt:
                 if check: mqtt_puplish('help I need water')
+                if print_info: print(f'mqtt sent')
                 #else: mqtt_puplish('all good')
 
             print_val(temp, hum, light, weight, threshhold_weight, check)

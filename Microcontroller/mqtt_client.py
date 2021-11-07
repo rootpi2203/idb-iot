@@ -47,7 +47,7 @@ def handle_message(client, topic, message):
 
 adafruit_minimqtt.set_socket(adafruit_esp32spi_socket, wifi)
 
-mqtt_client = adafruit_minimqtt.MQTT(broker=mqtt_broker, is_ssl=False)
+mqtt_client = adafruit_minimqtt.MQTT(broker=mqtt_broker, port=1883,  is_ssl=False)
 
 # Set callback handlers
 mqtt_client.on_connect = handle_connect

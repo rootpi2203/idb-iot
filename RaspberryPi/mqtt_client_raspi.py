@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 #  mosquitto_sub -h localhost -t /test/topic
 
 MQTT_SERVER = "localhost"
-MQTT_PATH = "test/topic"
+MQTT_PATH = "/test/topic"
 
 
 def on_connect(mqttc, obj, flags, rc):

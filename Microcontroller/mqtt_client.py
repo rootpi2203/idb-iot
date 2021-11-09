@@ -1,3 +1,4 @@
+import time
 import board
 import busio
 import digitalio
@@ -33,17 +34,22 @@ print("IP address", wifi.pretty_ip(wifi.ip_address))
 #mqtt_broker = "test.mosquitto.org"
 #mqtt_topic = "hello"
 mqtt_broker = config['ipraspi']
-mqtt_topic = "test/topic"
+mqtt_topic = "/test/topic"
+
+#my_message = None
 
 def handle_connect(client, userdata, flags, rc):
     print("MQTT Connected to {0}".format(client.broker))
     mqtt_client.subscribe(mqtt_topic)
 
 def handle_subscribe(client, userdata, topic, granted_qos):
-    print("Subscribed to {0} with QOS {1}".format(topic, granted_qos))
+    print("MQTT Subscribed to {0} with QOS {1}".format(topic, granted_qos))
 
 def handle_message(client, topic, message):
-    print("Received on {0}: {1}".format(topic, message))
+    print("MQTT Received on {0}: {1}".format(topic, message))
+    #print(dtypes(message)
+    global my_message
+    my_message = message
 
 adafruit_minimqtt.set_socket(adafruit_esp32spi_socket, wifi)
 
@@ -59,3 +65,7 @@ mqtt_client.connect()
 
 while True:
     mqtt_client.loop()
+    time.sleep(3)
+    #print(mqtt_client.on_message)
+    print(my_message)
+    #your code here :-)

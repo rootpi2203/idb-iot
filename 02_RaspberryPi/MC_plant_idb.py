@@ -34,11 +34,9 @@ TS_HTTP_HOST = "api.thingspeak.com"
 ###### MQTT ###############
 MQTT_SERVER = config['ipraspi']
 MQTT_PATH = "/plant_measurement/plant1/topic"
-print('Hi, I\'m plant 1')
 
 ######## Hardware - Pin Belegung (Grove Board) ##
 button_pin = 5
-poti_pin = 0
 dht11_pin = 16
 light_pin = 2
 led_pin = 6
@@ -48,7 +46,6 @@ hx711_sck_pin = 12
 ######## Setup #######################
 led = GroveLed(led_pin)  # Pi, Grove, setup Led, digital out
 btn = Factory.getButton("GPIO-HIGH", button_pin)  # Pi, Grove D5, setup button, digitla in
-poti = GroveSlidePotentiometer(poti_pin)  # Pi, Grove A0, setup Potentiometer
 dht11 = seeed_dht.DHT('11', dht11_pin)  # Pi, Grove D16, setup dht, analog in
 light_sen = GroveLightSensor(light_pin)  # setup light sensor
 hx = HX711(hx711_dout_pin, hx711_sck_pin)  # Weight scale
@@ -59,13 +56,14 @@ INTERVAL_MAIN_LOOP = 0.2
 NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
 start_t1 = 0   # temp storage time
-weight = 100
+weight = 1000
 threshhold_weight = 980  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
 print_info = False
 use_http = True
 use_mqtt = True
+
 ####### Functions ##################
 def read_dht():
     temp, hum = dht11.read()
@@ -133,8 +131,8 @@ def isTimerExpired():
         _counter = _counter - 1
         return False
 
-
 ##### startup ####
+print('Hi, I\'m plant 1')
 print(check_setup())  # check setup
 set_scale(weight=1000)  # set known load to scale
 

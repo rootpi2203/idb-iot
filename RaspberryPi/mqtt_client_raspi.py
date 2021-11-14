@@ -7,7 +7,7 @@ MQTT_PATH = "/test/topic"
 
 def on_connect(mqttc, obj, flags, rc):
     print("rc: " + str(rc))
-
+    mqttc.subscribe(MQTT_PATH, 0)
 
 def on_message(mqttc, obj, msg):
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
@@ -37,6 +37,5 @@ mqttc.on_subscribe = on_subscribe
 # Uncomment to enable debug messages
 # mqttc.on_log = on_log
 mqttc.connect(MQTT_SERVER, 1883, 60)
-mqttc.subscribe(MQTT_PATH, 0)
 
 mqttc.loop_forever()

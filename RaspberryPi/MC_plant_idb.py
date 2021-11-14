@@ -32,8 +32,9 @@ TS_WRITE_API_KEY = config['thingspeak_key']
 TS_HTTP_HOST = "api.thingspeak.com"
 
 ###### MQTT ###############
-MQTT_SERVER = 'localhost'  #config['ipraspi']
-MQTT_PATH = "/test/topic"
+MQTT_SERVER = config['ipraspi']
+MQTT_PATH = "/plant_measurement/plant1/topic"
+print('Hi, I\'m Plant 1')
 
 ######## Hardware - Pin Belegung (Grove Board) ##
 button_pin = 5
@@ -59,7 +60,7 @@ NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
 start_t1 = 0   # temp storage time
 weight = 100
-threshhold_weight = 150  # set at startup (mid of poti)
+threshhold_weight = 980  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
 print_info = False
@@ -121,6 +122,7 @@ def send_http(temp, hum, light, weight, threshhold_weight, check):
 
 def mqtt_puplish(info_text:str):
     publish.single(MQTT_PATH, info_text, hostname=MQTT_SERVER)
+    print(f'mqtt sent: {MQTT_PATH}: {info_text}')
 
 def isTimerExpired():
     global _counter
@@ -149,7 +151,6 @@ while True:
             check = check_water(weight, threshhold_weight)
             if use_mqtt:
                 if check: mqtt_puplish('help I need water')
-                if print_info: print(f'mqtt sent')
                 #else: mqtt_puplish('all good')
 
             print_val(temp, hum, light, weight, threshhold_weight, check)

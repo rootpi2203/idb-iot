@@ -34,7 +34,7 @@ TS_HTTP_HOST = "api.thingspeak.com"
 ###### MQTT ###############
 MQTT_SERVER = config['ipraspi']
 MQTT_PATH = "/plant_measurement/plant1/topic"
-print('Hi, I\'m Plant 1')
+print('Hi, I\'m plant 1')
 
 ######## Hardware - Pin Belegung (Grove Board) ##
 button_pin = 5
@@ -54,7 +54,7 @@ light_sen = GroveLightSensor(light_pin)  # setup light sensor
 hx = HX711(hx711_dout_pin, hx711_sck_pin)  # Weight scale
 
 # Constants
-INTERVAL_SENSOR_READING = 5   # time interval. Measurement every Interval second
+INTERVAL_SENSOR_READING = 10   # time interval. Measurement every Interval second
 INTERVAL_MAIN_LOOP = 0.2
 NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
@@ -147,7 +147,7 @@ while True:
         try:
             hum, temp = read_dht()   # Read the temperature + humidity
             light = read_light()  # Read Light sensor
-            weight = read_weight(reads=30)  # reads the mean from 30 values from hx711 (30-> 3sec)
+            weight = read_weight(reads=50)  # reads the mean from 30 values from hx711 (30-> 3sec)
             check = check_water(weight, threshhold_weight)
             if use_mqtt:
                 if check: mqtt_puplish('help I need water')

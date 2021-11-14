@@ -62,7 +62,6 @@ def handle_subscribe(client, userdata, topic, granted_qos):
 
 def handle_message(client, topic, message):
     print("MQTT Received on {0}: {1}".format(topic, message))
-    #print(dtypes(message)
     global mqtt_message
     mqtt_message = {'topic':topic, 'message':message}
 

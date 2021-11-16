@@ -2,7 +2,7 @@
 # Mini Challenge idb HS21 - Manuel Schwarz
 # Messungen: Gewicht, Temperatur, Luftfeuchtigkeit und Lichtstärke messen
 # mit button die Gewichtsgrenze festlegen. Fällt das Gewicht darunter wird
-# die led eingeschaltet -> Pflanze benötigt Wasser.
+# die led eingeschaltet -> Pflanze benötigt Wasser. MQTT
 ###########
 # Grove Board Layout pi - https://github.com/tamberg/fhnw-idb/wiki/Grove-Adapters#mapping
 # button        -> Grove D5
@@ -156,6 +156,9 @@ while True:
                 send_http(temp, hum, light, weight, threshhold_weight, check)
 
         except RuntimeError as e:
+            print_val(-1, -1, -1, -1, -1, -1)
+        except Exception as e:
+            print(e)
             print_val(-1, -1, -1, -1, -1, -1)
 
     end_meas = time.monotonic()  # timing measurement end

@@ -120,14 +120,12 @@ def servo_does_something():
             time.sleep(1.0)
             my_servo.throttle = 0.0
 
-def check_servo_count():
-    global MAX_SERVO_COUNTER
-    global current_servo_counter
-
-    if current_servo_counter <= MAX_SERVO_COUNTER:
-        return True
+def check_servo_counter():
+    if current_servo_counter >= MAX_SERVO_COUNTER:
+        start = time.monotonic()
     else:
-        return False
+        start = 0
+    return start
 
 
 while True:
@@ -136,8 +134,13 @@ while True:
     check_mqtt_message()  # Check Message and write Alarm status
     check_alarm_status()  # Checks Alarm Status and react
 
-    if check_servo_count():
-        start = time.time()
+
+    # check servo counter
+    start = check_servo_counter()
+    end = time.monotonic()
+
+    if (end - start) > 10:
+        current_servo_counter = 0
 
 
 

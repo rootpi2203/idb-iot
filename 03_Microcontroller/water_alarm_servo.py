@@ -78,16 +78,23 @@ print("\nMQTT Connecting to {0}".format(mqtt_broker))
 mqtt_client.connect()
 
 # Alarm Aktionen
+MAX_SERVO_COUNTER = 5
+current_servo_counter = 0
+
 def check_mqtt_message():
     global mqtt_message
     global alarm_status
+    global current_servo_counter
+
     if mqtt_message['message'] == alarm_message:
         mqtt_message.update({'topic':0, 'message':0})
         alarm_status = 1
+        current_servo_counter += 1
         print(f'alarm_status: {alarm_status}')
 
 def check_alarm_status():
     global alarm_status
+
     if alarm_status == 0:
         return
 
@@ -96,26 +103,42 @@ def check_alarm_status():
         alarm_status = 0
         print(f'alarm_status: {alarm_status}')
 
+
     elif alarm_status == 2:
         pass
 
 def servo_does_something():
-    for i in range(ARMMOVEMENT):
-        #print("forward")
-        my_servo.throttle = 1
-        time.sleep(1.0)
-        my_servo.throttle = 0.0
-        time.sleep(1.0)
-        #print("reverse")
-        my_servo.throttle = -1
-        time.sleep(1.0)
-        my_servo.throttle = 0.0
+    if current_servo_counter <= MAX_SERVO_COUNTER:
+        for i in range(ARMMOVEMENT):
+            #print("forward")
+            my_servo.throttle = 1
+            time.sleep(1.0)
+            my_servo.throttle = 0.0
+            time.sleep(1.0)
+            #print("reverse")
+            my_servo.throttle = -1
+            time.sleep(1.0)
+            my_servo.throttle = 0.0
+
+def check_servo_count():
+    global MAX_SERVO_COUNTER
+    global current_servo_counter
+
+    if current_servo_counter <= MAX_SERVO_COUNTER:
+        return True
+    else:
+        return False
 
 
 while True:
+
     mqtt_client.loop()  # Reads MQTT Topic
     check_mqtt_message()  # Check Message and write Alarm status
     check_alarm_status()  # Checks Alarm Status and react
+
+    if check_servo_count():
+        start = time.time()
+
 
 
 

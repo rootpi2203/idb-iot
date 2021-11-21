@@ -57,7 +57,7 @@ NR_LOOPS = INTERVAL_SENSOR_READING / INTERVAL_MAIN_LOOP
 _counter = NR_LOOPS
 start_t1 = 0   # temp storage time
 weight = 1000
-threshhold_weight = 980  # set at startup (mid of poti)
+threshhold_weight = 950  # set at startup (mid of poti)
 TIME_SLEEP = 1
 start_up = True
 print_info = False
@@ -172,7 +172,7 @@ while True:
     ############################################################
     # Set check_weight: weight of dryed plant by pressing button
     if btn.is_pressed():
-        threshhold_weight = weight - 20  # set threshhold lower than weight
+        threshhold_weight = weight - 50  # set threshhold lower than weight
         print(f'button pressed new threshold = {threshhold_weight}')
 
     # Check if plant needs water: Turn on led

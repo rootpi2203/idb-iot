@@ -1,3 +1,5 @@
 # Dataspell konfig files
 .idea
 **/02.RaspberryPi/config.py
+.config.py
+*/config.py

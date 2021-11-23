@@ -25,6 +25,7 @@ from config import config
 # credits to https://github.com/gandalf15/HX711/blob/master/python_examples/all_methods_example.py
 # MQTT
 import paho.mqtt.publish as publish
+import statistics as stat
 
 ####### Thingspeak ########
 # ThingSpeak settings
@@ -157,7 +158,8 @@ while True:
 
         except RuntimeError as e:
             print_val(-1, -1, -1, -1, -1, -1)
-        except Exception as e:
+        #except Exception as e:
+        except stat.StatisticsError as e:
             print(e)
             print_val(-1, -1, -1, -1, -1, -1)
 

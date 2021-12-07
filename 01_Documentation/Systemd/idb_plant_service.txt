@@ -1,0 +1,14 @@
+[Unit]
+Description = idb_plant Service
+Requires = network.target
+
+[Service]
+Type = idle
+User = pi
+ExecStart = /usr/bin/python3 /home/pi/idb-iot/02_RaspberryPi/MC_plant_idb.py
+
+Restart = always
+RestartSec = 10
+
+[Install]
+WantedBy = multi-user-target

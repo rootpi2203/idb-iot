@@ -60,6 +60,8 @@ start_t1 = 0   # temp storage time
 weight = 1000
 threshhold_weight = 950  # set at startup (mid of poti)
 TIME_SLEEP = 1
+
+# Communication Parameter
 start_up = True
 print_info = False
 use_http = True
@@ -134,9 +136,10 @@ def isTimerExpired():
 
 ##### startup ####
 print('Hi, I\'m plant 1')
-print(check_setup())  # check setup
 set_scale(weight=1000)  # set known load to scale
+print(check_setup())  # check setup
 
+# run program
 while True:
     # Measuring every INTERVAL Second
     #################################################################

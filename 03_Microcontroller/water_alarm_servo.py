@@ -103,7 +103,6 @@ def check_alarm_status():
         alarm_status = 0
         print(f'alarm_status: {alarm_status}')
 
-
     elif alarm_status == 2:
         pass
 
